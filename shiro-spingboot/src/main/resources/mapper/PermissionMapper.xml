@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pc.mapper.PermissionMapper">
+  <resultMap id="BaseResultMap" type="com.pc.vo.Permission">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="permission_name" jdbcType="VARCHAR" property="permissionName" />
+    <result column="create_name" jdbcType="TIMESTAMP" property="createName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, permission_name, create_name
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_permission
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.pc.vo.Permission" useGeneratedKeys="true">
+    insert into t_permission (permission_name, create_name)
+    values (#{permissionName,jdbcType=VARCHAR}, #{createName,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.pc.vo.Permission" useGeneratedKeys="true">
+    insert into t_permission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="permissionName != null">
+        permission_name,
+      </if>
+      <if test="createName != null">
+        create_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="permissionName != null">
+        #{permissionName,jdbcType=VARCHAR},
+      </if>
+      <if test="createName != null">
+        #{createName,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.pc.vo.Permission">
+    update t_permission
+    <set>
+      <if test="permissionName != null">
+        permission_name = #{permissionName,jdbcType=VARCHAR},
+      </if>
+      <if test="createName != null">
+        create_name = #{createName,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.pc.vo.Permission">
+    update t_permission
+    set permission_name = #{permissionName,jdbcType=VARCHAR},
+      create_name = #{createName,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="queryAllPermissionNameByUsername" parameterType="string" resultType="string">
+    select distinct  t_permission.permission_name
+    from t_user
+           join t_user_role on t_user.id = t_user_role.user_id
+           join t_role on t_role.id = t_user_role.role_id
+           join t_role_permission on t_role.id = t_role_permission.role_id
+           join t_permission on t_permission.id = t_role_permission.permission_id
+    where t_user.username = #{username}
+  </select>
+</mapper>
